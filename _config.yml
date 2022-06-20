@@ -21,16 +21,16 @@ avatar: /images/Avatar.png
 # Includes an icon in the footer for each username you enter
 footer-links:
   dribbble:
-  email: 
+  email: me@zachstrout.com
   facebook:
   flickr:
   github: RTnhN
   instagram:
-  linkedin: 
+  linkedin: zach-strout-6bb598237/
   pinterest:
   rss: rss
   twitter: 
-  stackoverflow:
+  stackoverflow: users/11351671/zachs
   youtube: # channel/<your_long_string> or user/<user-name>
   googleplus: # anything in your profile username that comes after plus.google.com/
   playconsole:
@@ -41,10 +41,10 @@ footer-links:
 disqus: zachstrout
 
 # Enter your Google Analytics web tracking code (e.g. UA-2110908-2) to activate tracking
-google_analytics: UA-43339302-11
+# google_analytics: UA-43339302-11
 
 # For newer "GA4" analytics, use the following instead of the "UA" entry above
-#google_analytics_ga4: G-GABC1DEFG
+google_analytics_ga4: G-TZZ4VC90D2
 
 # Your website URL (e.g. http://amitmerchant1990.github.io or http://www.amitmerchant.com)
 # Used for Sitemap.xml and your RSS feed

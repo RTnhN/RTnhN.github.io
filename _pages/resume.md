@@ -100,14 +100,15 @@ Available at <a href="https://www.zachstrout.com/memory-game">www.zachstrout.com
         <td>Sklearn ★★★★★</td>
         <td>Tensorflow ★★★★☆</td>
         <td>Keras ★★★★★</td>
-    </tr>
-    <tr>
         <td>KerasTuner ★★★★☆</td>
-        <td>Tensorboard ★★★★★</td>
     </tr>
     <tr>
+        <td>Tensorboard ★★★★★</td>
         <td>GCP ★★★★☆</td>
         <td>Meta-learning ★★★☆☆</td>
+    </tr>
+    <tr>
+
     </tr>
 </table>
 

@@ -11,7 +11,10 @@ sitemap: false
 
 17257 Clear Sky Circle Flint, Texas 75762 
 
- 903-352-5258 &nbsp; • &nbsp; <a href="mailto:Zachstrout@gmail.com" >Zachstrout@gmail.com </a> &nbsp; • &nbsp; Github: <a href="https://github.com/RTnhN/" >RTnhN</a> 
+903-352-5258 &nbsp; • &nbsp; <a href="mailto:Zachstrout@gmail.com" >Zachstrout@gmail.com </a> &nbsp; • &nbsp; Github:&nbsp; <a href="https://github.com/RTnhN/" >RTnhN</a> 
+   
+Linkedin:&nbsp; <a href="https://www.linkedin.com/in/zach-strout-engr/"> zach-strout-engr </a> &nbsp; • &nbsp; Website:&nbsp;<a href="https://www.zachstrout.com" >zachstrout.com </a> 
+
 </div>
 
 ### Work Experience
@@ -125,6 +128,11 @@ Available at <a href="https://www.zachstrout.com/memory-game">www.zachstrout.com
 
 <br/>
 
-<div style="display:flex; flex-direction:column; align-items:center;"> {% include qr-code.html%} <br/> Scan or go to www.zachstrout.com/resume for a digital version </div>
+<div id="qrcode"> {% include qr-code.html%} <br/> Scan or go to www.zachstrout.com/resume for a digital version </div>
 
 </div>
+<div id="buttonContainer">
+<button id="printButton" onClick="window.print()">print</button>
+</div>
+
+

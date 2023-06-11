@@ -1152,7 +1152,7 @@ Modules - reusable parts of our design
   padding: 0px 10px;
 }
 
-.entry{
+.entry #resume{
   width: min(1000px, 80vw); 
   border-left: 1px solid black; 
   border-right: 1px solid black
@@ -1202,7 +1202,7 @@ Modules - reusable parts of our design
   body {
     font-size: 12px;
   }
-  .entry {
+  .entry #resume {
     border-left: none;
     border-right: none;
     width: 100%;

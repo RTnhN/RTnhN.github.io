@@ -28,18 +28,15 @@ footer-links:
   instagram:
   linkedin: zach-strout-engr/
   pinterest:
-  rss: rss
   twitter: 
-  stackoverflow: users/11351671/zachs
   youtube: # channel/<your_long_string> or user/<user-name>
   googleplus: # anything in your profile username that comes after plus.google.com/
-  unsplash: "@zstrout"
   thingiverse: zach_s
 
 
 # Enter your Disqus shortname (not your username) to enable commenting on posts
 # You can find your shortname on the Settings page of your Disqus account
-disqus: zachstrout
+disqus: 
 
 # Enter your Google Analytics web tracking code (e.g. UA-2110908-2) to activate tracking
 # google_analytics: UA-43339302-11

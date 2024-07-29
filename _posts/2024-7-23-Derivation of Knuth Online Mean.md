@@ -61,4 +61,35 @@ If we average the five values in the stream, we get the same result as the last 
 
 $$ \bar{x}_5 =   \frac{1+2+3+4+5}{5} = \frac{15}{5} = 3 $$
 
+Here is a Python implementation. You can initialize the class then call the update method with each new value. The update method will return the current mean. You can also use the mean property to get the current mean.
+
+``` python
+class KnuthRunningMean:
+    def __init__(self):
+        self.n = 0
+        self.mean = 0.0
+
+    def update(self, x):
+        self.n += 1
+        self.mean += (x - self.mean) / self.n
+        return self.mean
+
+running_mean = KnuthRunningMean()
+running_mean.update(1)
+print(running_mean.mean)
+# 1.0
+running_mean.update(2)
+print(running_mean.mean)
+# 1.5
+running_mean.update(3)
+print(running_mean.mean)
+# 2.0
+running_mean.update(4)
+print(running_mean.mean)
+# 2.5
+running_mean.update(5)
+print(running_mean.mean)
+# 3.0
+```
+
 

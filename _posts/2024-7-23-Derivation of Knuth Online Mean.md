@@ -10,23 +10,23 @@ The Knuth online mean is often defined as:
 
 $$ \bar{x}_N =  \bar{x}_{N-1} + \frac{x_N - \bar{x}_{N-1}}{N} $$
 
-where $\bar{x}\_{N}$ is the current mean, $\bar{x}\_{N-1}$ is the previous mean, $x\_N$ is the next value in the stream,and $N$ is the number of values in the stream.
+where $\bar{x}\_{N}$ is the current mean, $\bar{x}\_{N-1}$ is the previous mean, $x\_N$ is the next value in the stream, and $N$ is the number of values in the stream.
 
 We can start this derivation by first defining mean:
 
 $$ \bar{x}_N = \frac{x_N + x_{N-1} + \cdots + x_1}{N} $$
 
-Basically, you sum up all the values up to $N$ and divide by $N$.
+Basically, you sum up all the values up to and including $N$ and divide by $N$.
 
-Let's extract the $x_N$ formula and have it be part of it's own term:
+Let's extract the $x_N$ term and have it be part of it's own term:
 
 $$ \bar{x}_N = \frac{x_N}{N} + \frac{x_{N-1} + \cdots + x_1}{N} $$
 
-Let's define the previous mean as $\bar{x}_{N-1}$:
+Let's now define the previous mean as $\bar{x}_{N-1}$:
 
 $$ \bar{x}_{N-1} = \frac{x_{N-1} + \cdots + x_1}{N-1} $$
 
-The mean formula for $\bar{x}\_N$ is nearly matches the formula for $\bar{x}\_{N-1}$. The only difference is that the term is divided by $N$ instead of $N-1$. We can fix that though by multiplying by $\frac{N-1}{N-1}$
+The mean formula for $\bar{x}\_N$ is nearly matches the formula for $\bar{x}\_{N-1}$. The only difference is that the term is divided by $N$ instead of $N-1$. We can fix that though by multiplying by $(N-1)/(N-1)$.
 
 
 $$ \bar{x}_N = \frac{x_N}{N} + \frac{x_{N-1} + \cdots + x_1}{N} \cdot \frac{N-1}{N-1} $$
@@ -43,7 +43,7 @@ When using this formula, $\bar{x}\_0$ is set to 0 and $N$ is set to 1. For each 
 
 Let's work at a quick example. Let's say we have the following stream of values:
 
-[1,2,3,4,5]
+$$ x = \{1, 2, 3, 4, 5\}$$
 
 We start with $\bar{x}\_0$ set to 0 and $N$ set to 1.
 
@@ -58,4 +58,7 @@ $$ \bar{x}_4 =  \bar{x}_{3} + \frac{x_4 - \bar{x}_{3}}{4} = 2 + \frac{4 - 2}{4} 
 $$ \bar{x}_5 =  \bar{x}_{4} + \frac{x_5 - \bar{x}_{4}}{5} = 2.5 + \frac{5 - 2.5}{3} = 2.5 + \frac{2.5}{5} = 3 $$
 
 If we average the five values in the stream, we get the same result as the last mean value calculated using the online mean formula. 
+
+$$ \bar{x}_5 =   \frac{1+2+3+4+5}{5} = \frac{15}{5} = 3 $$
+
 

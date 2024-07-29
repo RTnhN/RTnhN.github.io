@@ -13,7 +13,9 @@ Have you ever wanted to send a balloon to the edge of space and predict where it
 
 [Wayback Machine link to 555 timer calculator](https://web.archive.org/web/20040608020414/http://555-timer.clarkson-uk.com/)
 
-I really liked electronics growing up. I got a kit with a bunch of ICs, jumpers, solderless breadboards, and other components. I found that this website was a great resource for learning about the 555 timer. It had a calculator that would tell you what resistors and capacitors you needed to get a certain frequency or what modes the 555 chip could work in. It seemingly went down, but I found a copy on the wayback machine. 
+I really liked electronics growing up. I got a kit with a bunch of ICs, jumpers, solderless breadboards, and other components. I found that this website was a great resource for learning about the 555 timer. It had a calculator that would tell you what resistors and capacitors you needed to get a certain frequency or what modes the 555 chip could work in. It seemingly went down, but I found a copy on the wayback machine.
+
+Edit: The page submits data to a server which is down, so you can't really use it. 
 
 [Engineering Toolbox](https://www.engineeringtoolbox.com/index.html)
 

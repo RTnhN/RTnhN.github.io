@@ -18,7 +18,7 @@ avatar: /images/Avatar.png
 # Flags below are optional
 #
 
-excerpt_separator: "\n\n"
+excerpt_separator: "<!--more-->"
 
 
 # Includes an icon in the footer for each username you enter

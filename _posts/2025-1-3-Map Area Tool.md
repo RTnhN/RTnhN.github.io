@@ -4,7 +4,7 @@ title: Map Area Tool
 categories: [Blog, WebThingy]
 ---
 
-I was using [Web Plot Digitizer](https://apps.automeris.io/wpd4/) to calculate the area of something in an image. While this works okay, I really wanted a more intuitive way of doing this. 
+I was using [Web Plot Digitizer](https://apps.automeris.io/wpd4/) to calculate the area of something in an image. While this works okay, I really wanted a more intuitive way of doing this.
 
 What I wanted was a way to paint one area that paint another area to compare the two areas. This can be used for many things. One case is to compare the total space of a store vs the space taken with parking lots. To get this data, I created [Image Area Draw Calc](https://zachstrout.com/Image-Area-Draw-Calc/) (Yeah, I know it is an awful name). You can draw multiple areas and the areas will be calculated in relation to them. You can also use different opacities, so you can still see the image below it. It might be good to see with an example. Below is what I did for a local walmart. Note that the intensity of the color has no relation to the counting of area. Light coloring is as effective as dark coloring.  
 

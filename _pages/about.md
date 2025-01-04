@@ -4,4 +4,4 @@ title: About
 permalink: /about/
 ---
 
-Hi, my name is Zach Strout. I have interests in design, photography, web development, machine learning, biomechanics, economics, theology, and China/Chinese culture among other things. 
+Hi, my name is Zach Strout. I have interests in design, 3d printing, electronics, photography, web development, machine learning, biomechanics, economics among other things. 

@@ -6,6 +6,7 @@ categories: [Blog]
 
 I realized that with [onshape](https://www.onshape.com) I could share direct links to some of my designs. Below are a few special ones:
 
+<!--more-->
 
 Spin bikes adjust the resistance by typically by moving some sort of brake into the spinning wheel. This could be a friction break or it could use [Lenz law](https://en.wikipedia.org/wiki/Lenz%27s_law) like the one at my gym. The bikes at my gym don't have any way to determine how much resistance there is. A simple solution to this is to have some sort of device that can measure how far up the brake is and read off how much resistance. That is exactly what this does. You can see the [spin bike resistance meter here](https://cad.onshape.com/documents/5d16c57c6138c0a3fbce8c90/w/1669e9df286c5e4f095f9a8c/e/4e7079050bc23f54e5552a50).
 

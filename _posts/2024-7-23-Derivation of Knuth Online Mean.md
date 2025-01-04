@@ -6,6 +6,8 @@ categories: [Blog]
 
 For some of the projects I am working on, I need to calculate the mean of a stream of data. I have found that the Knuth online mean is a good way to do this. It is a simple algorithm that is easy to understand and implement. The other nice thing about the formula is that you just need to keep the last mean and the number of samples that have been used in the mean calculation. You don't need to keep a list of all of the values in the stream so far.  While I found the formula online, I was not able to find a derivation of it. It is probably in TAOCP, but I thought that it would be more interesting to derive it myself. That is all that this post is about. I also will show how it is used. 
 
+<!--more-->
+
 The Knuth online mean is often defined as:
 
 $$ \bar{x}_N =  \bar{x}_{N-1} + \frac{x_N - \bar{x}_{N-1}}{N} $$

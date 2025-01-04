@@ -6,6 +6,7 @@ categories: [Blog]
 
 While I was waiting for some code to compile, I decided to go though my bookmarks and clean them up. Here are some links that I found interesting:
 
+<!--more-->
 
 [Balloon Trajectory Calculator](http://weather.uwyo.edu/polar/balloon_traj.html)
 

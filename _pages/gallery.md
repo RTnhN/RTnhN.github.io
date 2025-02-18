@@ -76,7 +76,7 @@ title: Photo Gallery
   <div class="grid-sizer"></div>
   {% assign photos = site.static_files | where_exp: "file", "file.path contains 'images/gallery/thumbnails'" %}
   {% for photo in photos %}
-  {% assign full_image_path = photo.path | replace: 'thumbnails', 'full' %}
+  {% assign full_image_path = photo.path | replace: 'thumbnails', 'full_res' %}
   <div class="grid-item">
     <a href="{{ full_image_path | prepend: site.baseurl }}">
       <img loading="lazy" src="{{ photo.path | prepend: site.baseurl }}" alt="{{ photo.basename }}">

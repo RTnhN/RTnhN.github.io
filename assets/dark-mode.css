@@ -13,61 +13,61 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-body.dark-mode {
+.dark-mode body {
   background: var(--dark-bg);
   color: var(--dark-text);
 }
 
-body.dark-mode a {
+.dark-mode a {
   color: var(--dark-link);
 }
 
-body.dark-mode .masthead {
+.dark-mode .masthead {
   border-bottom-color: #333;
 }
 
-body.dark-mode .site-name,
-body.dark-mode .site-description,
-body.dark-mode nav a,
-body.dark-mode nav #theme-toggle {
+.dark-mode .site-name,
+.dark-mode .site-description,
+.dark-mode nav a,
+.dark-mode nav #theme-toggle {
   color: var(--dark-text);
 }
 
-body.dark-mode .pagination a,
-body.dark-mode .pagination span {
+.dark-mode .pagination a,
+.dark-mode .pagination span {
   background-color: #333;
   border-color: #555;
   color: var(--dark-text);
 }
 
-body.dark-mode .pagination a:hover {
+.dark-mode .pagination a:hover {
   background-color: #444;
   color: var(--dark-text);
 }
 
-body.dark-mode .wrapper-footer {
+.dark-mode .wrapper-footer {
   background-color: #1e1e1e;
 }
 
-body.dark-mode footer {
+.dark-mode footer {
   color: var(--dark-text);
 }
 
-body.dark-mode .post-tags a {
+.dark-mode .post-tags a {
   background-color: #333;
   color: var(--dark-text);
 }
 
-body.dark-mode h1,
-body.dark-mode h2,
-body.dark-mode h3,
-body.dark-mode h4,
-body.dark-mode h5,
-body.dark-mode h6 {
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6 {
   color: var(--dark-text);
 }
 
-body.dark-mode nav a:hover {
+.dark-mode nav a:hover {
   color: var(--dark-link);
 }
 
@@ -87,6 +87,6 @@ nav #theme-toggle {
   }
 }
 
-body.dark-mode nav #theme-toggle {
+.dark-mode nav #theme-toggle {
   color: var(--dark-text);
 }

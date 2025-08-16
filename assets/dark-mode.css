@@ -1,0 +1,92 @@
+:root {
+  --light-bg: #fff;
+  --light-text: #404040;
+  --light-link: #4183C4;
+  --dark-bg: #121212;
+  --dark-text: #e0e0e0;
+  --dark-link: #8ab4f8;
+}
+
+body {
+  background: var(--light-bg);
+  color: var(--light-text);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dark-mode body {
+  background: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+.dark-mode a {
+  color: var(--dark-link);
+}
+
+.dark-mode .masthead {
+  border-bottom-color: #333;
+}
+
+.dark-mode .site-name,
+.dark-mode .site-description,
+.dark-mode nav a,
+.dark-mode nav #theme-toggle {
+  color: var(--dark-text);
+}
+
+.dark-mode .pagination a,
+.dark-mode .pagination span {
+  background-color: #333;
+  border-color: #555;
+  color: var(--dark-text);
+}
+
+.dark-mode .pagination a:hover {
+  background-color: #444;
+  color: var(--dark-text);
+}
+
+.dark-mode .wrapper-footer {
+  background-color: #1e1e1e;
+}
+
+.dark-mode footer {
+  color: var(--dark-text);
+}
+
+.dark-mode .post-tags a {
+  background-color: #333;
+  color: var(--dark-text);
+}
+
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6 {
+  color: var(--dark-text);
+}
+
+.dark-mode nav a:hover {
+  color: var(--dark-link);
+}
+
+nav #theme-toggle {
+  margin-left: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+}
+
+@media screen and (max-width: 640px) {
+  nav #theme-toggle {
+    margin: 0 10px;
+    color: #4183C4;
+  }
+}
+
+.dark-mode nav #theme-toggle {
+  color: var(--dark-text);
+}

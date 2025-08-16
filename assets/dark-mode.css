@@ -33,6 +33,28 @@ body.dark-mode nav #theme-toggle {
   color: var(--dark-text);
 }
 
+body.dark-mode .wrapper-footer {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode footer {
+  color: var(--dark-text);
+}
+
+body.dark-mode .post-tags a {
+  background-color: #333;
+  color: var(--dark-text);
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: var(--dark-text);
+}
+
 body.dark-mode nav a:hover {
   color: var(--dark-link);
 }

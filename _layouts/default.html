@@ -6,6 +6,7 @@
     {% include meta.html %}
 
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/style.css" />
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/dark-mode.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
     <link rel="canonical" href="{{ site.url }}{{ page.url }}" />
 
@@ -13,6 +14,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/images/favicon-32x32.png">
     {% include analytics_head.html %}
     {% include scripts.html%}
+    <script src="{{ site.baseurl }}/assets/theme-toggle.js" defer></script>
   </head>
 
   <body>
@@ -33,6 +35,7 @@
               <a href="{{ site.baseurl }}/search">Search</a>
               <a href="{{ site.baseurl }}/about">About</a>
               <a href="{{ site.baseurl }}/gallery">Gallery</a>
+              <button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
             </nav>
           </header>
         </div>

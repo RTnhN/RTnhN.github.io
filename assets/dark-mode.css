@@ -33,6 +33,18 @@ body.dark-mode nav #theme-toggle {
   color: var(--dark-text);
 }
 
+body.dark-mode .pagination a,
+body.dark-mode .pagination span {
+  background-color: #333;
+  border-color: #555;
+  color: var(--dark-text);
+}
+
+body.dark-mode .pagination a:hover {
+  background-color: #444;
+  color: var(--dark-text);
+}
+
 body.dark-mode .wrapper-footer {
   background-color: #1e1e1e;
 }

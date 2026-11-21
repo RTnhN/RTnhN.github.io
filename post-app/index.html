@@ -75,6 +75,15 @@
       <p id="status" class="status" role="status"></p>
     </section>
 
+    <section class="recent outbox" id="outbox" hidden>
+      <div class="recent-head">
+        <h2>Outbox <span id="outbox-count" class="muted"></span></h2>
+        <button type="button" id="send-now" class="ghost small">Send now</button>
+      </div>
+      <p class="muted small-text">Saved on this device. They send automatically when the app is open and online.</p>
+      <ul id="outbox-list" class="note-list"></ul>
+    </section>
+
     <section class="recent" id="recent">
       <div class="recent-head">
         <h2>Recent notes</h2>

@@ -12,6 +12,13 @@ GitHub Pages then rebuilds the site.
   animated.
 - `#hashtags` stay in the text and are also written to `tags:`.
 - One commit per note (photos included); recent notes can be edited or deleted.
+- **Offline outbox:** every new post (text + photos) is saved to IndexedDB on the device
+  first, then sent oldest-first whenever the app is open and GitHub is reachable (on
+  open, when the connection returns, when the app comes back to the foreground, or via
+  *Send now*). Notes keep the time they were written. If a commit went through but the
+  reply was lost, the retry sees the identical note already in the repo and doesn't post
+  it twice. iOS has no background sync for web apps, so queued posts only send while the
+  app is open. Edits and deletes still need a connection.
 - `?text=…&url=…` pre-fills the composer (handy for an iOS Shortcut share action).
 
 This folder is excluded from the Jekyll build (`exclude:` in `_config.yml`), so it is
@@ -97,5 +104,6 @@ cd post-app && python3 -m http.server 4100
 | `app.js` | Composer, photo processing, publish/edit/delete |
 | `lib.js` | Note format helpers (timestamps, tags, links, front matter) |
 | `github.js` | Minimal GitHub client; multi-file commits via the Git Data API |
+| `outbox.js`, `send.js` | Offline outbox (IndexedDB) and sending queued posts |
 | `sw.js`, `manifest.json`, icons | Installable PWA + offline app shell |
 | `_headers` | Cloudflare security headers (CSP etc.) |

@@ -1,7 +1,7 @@
 // Offline support for the app shell only. GitHub API calls are never cached.
-const CACHE = 'post-app-v1';
+const CACHE = 'post-app-v2';
 const SHELL = [
-  './', 'index.html', 'app.css', 'app.js', 'lib.js', 'github.js',
+  './', 'index.html', 'app.css', 'app.js', 'lib.js', 'github.js', 'outbox.js', 'send.js',
   'manifest.json', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png',
 ];
 

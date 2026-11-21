@@ -216,3 +216,17 @@ textarea {
 .diagnostics .fail td:last-child { color: var(--danger); }
 .diagnostics .info td { color: var(--muted); }
 #diagnose { margin-top: 10px; }
+
+#outbox-list { list-style: none; padding: 0; margin: 0; }
+#outbox-list li {
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+#outbox-list .meta { font-size: 13px; color: var(--muted); }
+#outbox-list .text { margin: 4px 0 6px; overflow-wrap: anywhere; }
+#outbox-list .text:empty { display: none; }
+#outbox-list .buttons .del { color: var(--danger); }
+.outbox > .muted { margin: -4px 0 8px; }

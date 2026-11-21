@@ -1,8 +1,9 @@
 import {
-  noteStamp, buildNote, parseNote, replaceBody, extractTags, summary, preview, unsanitize,
-  utf8ToBase64, base64ToUtf8, bytesToBase64,
+  noteStamp, parseNote, replaceBody, extractTags, summary, preview, unsanitize, base64ToUtf8,
 } from './lib.js';
 import { GitHub, CANARY_REPO } from './github.js';
+import { outbox, requestPersistence } from './outbox.js';
+import { sendItem } from './send.js';
 
 const SITE_URL = 'https://zachstrout.com';
 const DEFAULTS = { repo: 'RTnhN/RTnhN.github.io', branch: 'master' };
@@ -58,7 +59,7 @@ function errorText(e) {
   if (e && e.status === 401) return 'GitHub rejected the token (expired or revoked?). Update it in settings.';
   if (e && e.status === 403) return 'Token lacks permission: it needs Contents read & write on this repo.';
   if (e && e.status === 404) return 'Repo or branch not found, or the token cannot see it.';
-  if (e instanceof TypeError) return 'Network error. Your draft is saved; try again when online.';
+  if (e instanceof TypeError) return 'Network error. Try again when you’re online.';
   return (e && e.message) || String(e);
 }
 
@@ -286,16 +287,79 @@ $('photo-input').addEventListener('change', async ev => {
 });
 
 // ---------- publish / save ----------
-async function blobToBase64(blob) {
-  return bytesToBase64(new Uint8Array(await blob.arrayBuffer()));
+let flushing = false;
+
+async function flushOutbox() {
+  if (flushing || !settings().token) return;
+  const items = await outbox.all().catch(() => []);
+  if (!items.length) return;
+  flushing = true;
+  const status = $('status');
+  const api = gh();
+  let sent = 0;
+  let lastStem = null;
+  try {
+    for (const item of items) {
+      setStatus(status, `Sending ${sent + 1} of ${items.length}…`);
+      lastStem = await sendItem(api, item);
+      await outbox.remove(item.id);
+      sent++;
+      await renderOutbox();
+    }
+    const label = sent === 1 ? 'Posted. Building…' : `Posted ${sent} notes. Building…`;
+    setStatus(status, liveLink(lastStem, label), 'ok');
+    const stem = lastStem;
+    waitForLive(stem).then(ok => {
+      if ($('status').querySelector(`a[href$="/${stem}/"]`)) {
+        setStatus($('status'), liveLink(stem, ok ? 'Live ✓' : 'Posted (still building; check GitHub if it doesn’t appear):'), 'ok');
+      }
+    });
+    loadRecent();
+  } catch (e) {
+    const left = items.length - sent;
+    const waiting = `${left} post${left === 1 ? '' : 's'} saved in the outbox`;
+    if (e instanceof TypeError) {
+      setStatus(status, `Offline. ${waiting}; ${left === 1 ? 'it' : 'they'}’ll send when you’re back online with the app open.`);
+    } else {
+      setStatus(status, `${errorText(e)} (${waiting}.)`, 'error');
+    }
+  } finally {
+    flushing = false;
+    await renderOutbox();
+  }
 }
 
-async function freeStem(api, stem) {
-  for (let n = 1; n < 20; n++) {
-    const candidate = n === 1 ? stem : `${stem}-${n}`;
-    if (!(await api.exists(`_notes/${candidate}.md`))) return candidate;
-  }
-  throw new Error('Too many notes this minute.');
+async function renderOutbox() {
+  const items = await outbox.all().catch(() => []);
+  $('outbox').hidden = items.length === 0;
+  $('outbox-count').textContent = items.length ? `(${items.length})` : '';
+  const list = $('outbox-list');
+  list.replaceChildren();
+  items.forEach(item => {
+    const li = document.createElement('li');
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = item.stamp.frontMatterDate.replace(/:\d\d [+-]\d{4}$/, '') +
+      (item.photos.length ? ` · 📷 ${item.photos.length}` : '');
+    const text = document.createElement('div');
+    text.className = 'text';
+    text.textContent = preview(item.text);
+    const buttons = document.createElement('div');
+    buttons.className = 'buttons';
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'ghost small del';
+    del.textContent = 'Discard';
+    del.addEventListener('click', async () => {
+      if (!confirm('Discard this unsent post? It can’t be recovered.')) return;
+      await outbox.remove(item.id);
+      setStatus($('status'), 'Discarded.');
+      renderOutbox();
+    });
+    buttons.appendChild(del);
+    li.append(meta, text, buttons);
+    list.appendChild(li);
+  });
 }
 
 function liveLink(stem, prefix) {
@@ -340,32 +404,26 @@ async function publish() {
       exitEdit();
       setStatus(status, liveLink(stem, 'Saved. Live in a minute or two:'), 'ok');
     } else {
-      setStatus(status, 'Posting…');
-      const stamp = noteStamp(new Date());
-      const stem = await freeStem(api, stamp.stem);
-      const changes = [];
-      const images = [];
-      for (let i = 0; i < photos.length; i++) {
-        setStatus(status, `Uploading photo ${i + 1} of ${photos.length}…`);
-        const path = `images/notes/${stem}-${i + 1}.${photos[i].ext}`;
-        changes.push({ path, base64: await blobToBase64(photos[i].blob) });
-        images.push({ src: '/' + path, alt: photos[i].alt.trim() });
-      }
-      changes.push({ path: `_notes/${stem}.md`, text: buildNote({ text, date: stamp.frontMatterDate, images }) });
-      setStatus(status, 'Committing…');
-      await api.commit(changes, `note: ${summary(text)}`);
-
+      // Save to the on-device outbox first, so nothing is lost if we're offline or
+      // the app is closed mid-upload. The note keeps the time it was written.
+      const now = new Date();
+      await outbox.add({
+        id: `${now.getTime()}-${Math.random().toString(36).slice(2, 8)}`,
+        created: now.getTime(),
+        stamp: noteStamp(now),
+        text,
+        photos: photos.map(p => ({ blob: p.blob, ext: p.ext, alt: p.alt.trim() })),
+      });
       textEl.value = '';
       store.del('draft');
       photos.forEach(p => URL.revokeObjectURL(p.url));
       photos = [];
       renderPhotos();
-      setStatus(status, liveLink(stem, 'Posted. Building…'), 'ok');
-      waitForLive(stem).then(ok => {
-        if ($('status').querySelector(`a[href$="/${stem}/"]`)) {
-          setStatus($('status'), liveLink(stem, ok ? 'Live ✓' : 'Posted (still building; check GitHub if it doesn’t appear):'), 'ok');
-        }
-      });
+      await renderOutbox();
+      busy = false;
+      refreshComposer();
+      flushOutbox();
+      return;
     }
     loadRecent();
   } catch (e) {
@@ -518,10 +576,19 @@ async function auditSavedToken() {
   } catch { /* offline: try again next time */ }
 }
 
+$('send-now').addEventListener('click', flushOutbox);
+window.addEventListener('online', flushOutbox);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') flushOutbox();
+});
+requestPersistence();
+renderOutbox();
+
 if (settings().token) {
   showSettings(false);
   loadRecent();
   auditSavedToken();
+  flushOutbox();
 } else {
   showSettings(true);
 }

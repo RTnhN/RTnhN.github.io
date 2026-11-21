@@ -78,3 +78,6 @@
 .dark-mode .notes-controls select,
 .dark-mode .notes-more { border-color: #444; }
 .dark-mode .notes-controls select option { background: #121212; }
+
+.notes-intro { color: #666; font-size: 16px; margin: 0 0 18px; text-align: left; }
+.dark-mode .notes-intro { color: #aaa; }

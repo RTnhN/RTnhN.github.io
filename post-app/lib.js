@@ -54,13 +54,39 @@ export function linkifyBareUrls(text) {
   });
 }
 
+/**
+ * Make note text safe to render: kramdown passes raw HTML and any link scheme
+ * straight through, so escape every "<" except <https://…> autolinks and drop
+ * Markdown links/images whose target isn't http(s), a site path, or mailto.
+ */
+const SAFE_TARGET = /^(https?:\/\/|\/(?!\/)|mailto:|#)/i;
+
+export function sanitizeBody(text) {
+  return text
+    // Raw HTML (anything but <https://…> autolinks).
+    .replace(/<(?!https?:\/\/[^\s<>]+>)/g, '&lt;')
+    // Kramdown attribute lists / extensions: {: onclick="…"}, {::nomarkdown}
+    .replace(/\{:/g, '\\{:')
+    // Inline links/images with unsafe targets (javascript:, data:, entities…).
+    .replace(/(!?\[[^\]]*\])\(\s*([^)\s]*)[^)]*\)/g, (all, label, target) =>
+      SAFE_TARGET.test(target) ? all : label)
+    // Reference-style link definitions: [1]: javascript:…
+    .replace(/^( {0,3})\[([^\]]+)\]:[ \t]*(\S*)/gm, (all, indent, ref, target) =>
+      SAFE_TARGET.test(target.replace(/^<|>$/g, '')) ? all : `${indent}\\[${ref}]:`);
+}
+
+/** Reverse of sanitizeBody's escaping, for showing a note in the editor. */
+export function unsanitize(text) {
+  return text.replace(/\\\{:/g, '{:').replace(/&lt;/g, '<').replace(/<(https?:[^>\s]+)>/g, '$1');
+}
+
 function tagsLine(tags) {
   return tags.length ? `tags: [${tags.join(', ')}]` : null;
 }
 
 /** Full Markdown file for a new note. images: [{src, alt}] */
 export function buildNote({ text, date, images = [] }) {
-  const body = linkifyBareUrls(text.trim());
+  const body = sanitizeBody(linkifyBareUrls(text.trim()));
   const lines = ['---', `date: ${date}`];
   const tl = tagsLine(extractTags(body));
   if (tl) lines.push(tl);
@@ -88,7 +114,7 @@ export function parseNote(file) {
 /** Replace a note's body, keeping its front matter but refreshing tags. */
 export function replaceBody(file, newText) {
   const { frontMatter } = parseNote(file);
-  const body = linkifyBareUrls(newText.trim());
+  const body = sanitizeBody(linkifyBareUrls(newText.trim()));
   const fm = frontMatter.split('\n').filter(l => !/^tags:/.test(l));
   const tl = tagsLine(extractTags(body));
   if (tl) fm.splice(1, 0, tl); // right after date

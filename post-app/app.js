@@ -1,5 +1,5 @@
 import {
-  noteStamp, buildNote, parseNote, replaceBody, extractTags, summary, preview,
+  noteStamp, buildNote, parseNote, replaceBody, extractTags, summary, preview, unsanitize,
   utf8ToBase64, base64ToUtf8, bytesToBase64,
 } from './lib.js';
 import { GitHub } from './github.js';
@@ -131,6 +131,7 @@ function applyShareParams() {
     const existing = textEl.value.trim();
     textEl.value = (existing ? existing + '\n\n' : '') + parts.join(' ');
     history.replaceState(null, '', location.pathname);
+    setStatus($('status'), 'Text was added from a link. Check it before posting.');
   }
 }
 
@@ -254,6 +255,7 @@ async function publish() {
   try {
     const api = gh();
     if (editing) {
+      if (!/^_notes\/[\w.-]+\.md$/.test(editing.path)) throw new Error('Refusing to edit a file outside _notes/.');
       setStatus(status, 'Saving…');
       const updated = replaceBody(editing.file, text);
       await api.commit([{ path: editing.path, text: updated }], `note: edit ${summary(text)}`);
@@ -310,7 +312,7 @@ function enterEdit(item) {
   photos.forEach(p => URL.revokeObjectURL(p.url));
   photos = [];
   renderPhotos();
-  textEl.value = parseNote(item.file).body.replace(/<(https?:[^>]+)>/g, '$1');
+  textEl.value = unsanitize(parseNote(item.file).body);
   refreshComposer();
   setStatus($('status'), '');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -403,7 +405,10 @@ async function removeNote(n, parsed, btn) {
   btn.disabled = true;
   try {
     const changes = [{ path: n.path, delete: true }];
-    parsed.images.forEach(src => changes.push({ path: src.replace(/^\//, ''), delete: true }));
+    parsed.images
+      .map(src => src.replace(/^\//, ''))
+      .filter(p => /^images\/notes\/[\w.-]+$/.test(p))
+      .forEach(path => changes.push({ path, delete: true }));
     await gh().commit(changes, `note: delete ${n.name}`);
     if (editing && editing.path === n.path) exitEdit();
     setStatus($('status'), `Deleted ${n.name}. The site updates in a minute or two.`, 'ok');

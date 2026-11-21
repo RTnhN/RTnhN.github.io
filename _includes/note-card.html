@@ -1,0 +1,28 @@
+{% comment %}
+  One note card. Params:
+    note    – the note document
+    content – (optional) rendered body; defaults to note.content
+    link    – true to link the timestamp to the note's own page
+{% endcomment %}
+{% assign n = include.note %}
+{% assign body = include.content | default: n.content %}
+<article class="note" data-date="{{ n.date | date: '%s' }}">
+  <header class="note-meta">
+    <img class="note-avatar" src="{{ site.baseurl }}{{ site.avatar }}" alt="" />
+    <span class="note-author">{{ site.author }}</span>
+    <span class="note-sep">·</span>
+    {% if include.link %}<a class="note-permalink" href="{{ site.baseurl }}{{ n.url }}">{% endif %}
+    <time datetime="{{ n.date | date_to_xmlschema }}" title="{{ n.date | date: '%B %-d, %Y %-I:%M %p' }}">{{ n.date | date: "%b %-d, %Y" }}</time>
+    {% if include.link %}</a>{% endif %}
+  </header>
+
+  <div class="note-body">{{ body }}</div>
+
+  {% if n.images and n.images.size > 0 %}
+  <div class="note-images note-images-{{ n.images.size | at_most: 4 }}">
+    {% for img in n.images %}
+      <a href="{{ site.baseurl }}{{ img.src }}"><img src="{{ site.baseurl }}{{ img.src }}" alt="{{ img.alt | escape }}" loading="lazy" /></a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</article>

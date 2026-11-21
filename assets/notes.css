@@ -1,0 +1,80 @@
+/* NOTES (microblog) */
+
+.notes { max-width: 600px; margin: 0 auto; }
+
+.notes-controls { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; }
+.notes-controls input,
+.notes-controls select {
+  font: inherit;
+  font-size: 16px; /* prevents iOS zoom on focus */
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+}
+.notes-controls input { flex: 1; min-width: 0; }
+.notes-controls .notes-rss { font-size: 14px; white-space: nowrap; }
+
+.note {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  text-align: left;
+}
+.note[hidden] { display: none; }
+
+.note-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 6px;
+}
+.note-meta .note-author { font-weight: 600; color: #333; }
+.note-meta .note-permalink { color: inherit; }
+
+.note-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; margin: 0; }
+
+.note-body { overflow-wrap: anywhere; }
+.note-body p { margin: 0 0 10px; }
+.note-body p:last-child { margin-bottom: 0; }
+.note-body img { max-width: 100%; border-radius: 8px; }
+
+.note-images {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.note-images-2, .note-images-3, .note-images-4 { grid-template-columns: 1fr 1fr; }
+.note-images a { display: block; line-height: 0; }
+.note-images img { width: 100%; height: 100%; max-height: 520px; object-fit: cover; margin: 0; }
+.note-images:not(.note-images-1) img { aspect-ratio: 1 / 1; }
+
+.notes-more {
+  display: block;
+  margin: 10px auto 30px;
+  font: inherit;
+  padding: 6px 18px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.notes-more[hidden] { display: none; }
+
+.notes-empty { text-align: center; color: #666; }
+.notes-back { margin-top: 10px; font-size: 15px; }
+
+.dark-mode .note { border-color: #333; }
+.dark-mode .note-meta { color: #999; }
+.dark-mode .note-meta .note-author { color: #e0e0e0; }
+.dark-mode .notes-controls input,
+.dark-mode .notes-controls select,
+.dark-mode .notes-more { border-color: #444; }
+.dark-mode .notes-controls select option { background: #121212; }

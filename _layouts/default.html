@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.name }} – {{ site.description }}</title>
+    {% if page.collection == "notes" %}{% capture page_title %}{{ page.content | strip_html | normalize_whitespace | truncatewords: 10 | default: "Note" }}{% endcapture %}{% else %}{% assign page_title = page.title %}{% endif %}
+    <title>{% if page_title %}{{ page_title }} – {% endif %}{{ site.name }} – {{ site.description }}</title>
     {% seo title=false %}
     {% include meta.html %}
 
@@ -17,7 +18,9 @@
 
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/style.css" />
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/dark-mode.css" />
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/notes.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
+    <link rel="alternate" type="application/atom+xml" title="{{ site.name }} – Notes" href="{{ site.baseurl }}/feed/notes.xml" />
     <link rel="canonical" href="{{ site.url }}{{ page.url }}" />
 
     <meta name="theme-color" content="#000000">
@@ -42,6 +45,7 @@
 
             <nav>
               <a href="{{ site.baseurl }}/">Home</a>
+              <a href="{{ site.baseurl }}/notes/">Notes</a>
               <a href="{{ site.baseurl }}/search">Search</a>
               <a href="{{ site.baseurl }}/about">About</a>
               <a href="{{ site.baseurl }}/gallery">Gallery</a>

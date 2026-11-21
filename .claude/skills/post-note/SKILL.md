@@ -52,7 +52,7 @@ minute or two after it is pushed.
    `git commit -m "note: <first few words>"` and push to `master`.
    If pushing to `master` is not allowed in this environment, push a branch, open a PR,
    and tell the user it needs merging to go live.
-7. Reply with the note's URL: `https://rtnhn.github.io/notes/<stem>/`.
+7. Reply with the note's URL: `https://zachstrout.com/notes/<stem>/`.
 
 ## Editing or deleting
 

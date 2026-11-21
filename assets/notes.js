@@ -50,6 +50,22 @@
     });
   }
 
+  // Link button: copy the note's URL; fall back to just following the link.
+  function shareButtons() {
+    document.querySelectorAll('.note-share').forEach(function (btn) {
+      btn.addEventListener('click', function (ev) {
+        if (!navigator.clipboard || !window.isSecureContext) return;
+        ev.preventDefault();
+        var label = btn.querySelector('.note-share-label');
+        navigator.clipboard.writeText(btn.getAttribute('data-url')).then(function () {
+          btn.classList.add('copied');
+          label.textContent = 'Copied';
+          setTimeout(function () { btn.classList.remove('copied'); label.textContent = 'Link'; }, 1800);
+        }, function () { location.href = btn.href; });
+      });
+    });
+  }
+
   function feed() {
     var list = document.getElementById('notes-list');
     if (!list) return;
@@ -65,7 +81,9 @@
     if (q0) search.value = q0;
 
     cards.forEach(function (c) {
-      c._text = c.textContent.toLowerCase();
+      var body = c.querySelector('.note-body');
+      c._text = ((body ? body.textContent : '') + ' ' +
+        Array.prototype.map.call(c.querySelectorAll('.note-images img'), function (i) { return i.alt; }).join(' ')).toLowerCase();
       c._date = Number(c.getAttribute('data-date')) || 0;
     });
 
@@ -93,7 +111,7 @@
     render();
   }
 
-  function init() { relativeTimes(); linkifyHashtags(); feed(); }
+  function init() { relativeTimes(); linkifyHashtags(); shareButtons(); feed(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();

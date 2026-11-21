@@ -14,6 +14,10 @@
     {% if include.link %}<a class="note-permalink" href="{{ site.baseurl }}{{ n.url }}">{% endif %}
     <time datetime="{{ n.date | date_to_xmlschema }}" title="{{ n.date | date: '%B %-d, %Y %-I:%M %p' }}">{{ n.date | date: "%b %-d, %Y" }}</time>
     {% if include.link %}</a>{% endif %}
+    <a class="note-share" href="{{ site.baseurl }}{{ n.url }}" data-url="{{ site.url }}{{ site.baseurl }}{{ n.url }}" title="Copy link to this note" aria-label="Copy link to this note">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M10.6 13.4a1 1 0 0 1 0-1.4l3.6-3.6a1 1 0 1 1 1.4 1.4L12 13.4a1 1 0 0 1-1.4 0Zm-1.9 5.3a4 4 0 0 1-5.7-5.7l2.8-2.8a1 1 0 1 1 1.4 1.4l-2.8 2.8a2 2 0 1 0 2.9 2.9l2.8-2.8a1 1 0 1 1 1.4 1.4l-2.8 2.8Zm9.9-6.4a1 1 0 0 1-1.4-1.4l2.8-2.8a2 2 0 1 0-2.9-2.9l-2.8 2.8a1 1 0 1 1-1.4-1.4L15.7 3.8a4 4 0 0 1 5.7 5.7l-2.8 2.8Z"/></svg>
+      <span class="note-share-label">Link</span>
+    </a>
   </header>
 
   <div class="note-body">{{ body }}</div>

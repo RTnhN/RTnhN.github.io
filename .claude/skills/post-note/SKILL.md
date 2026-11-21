@@ -36,6 +36,7 @@ minute or two after it is pushed.
    ```markdown
    ---
    date: 2026-11-20 14:32:00 -0600
+   tags: [imu, python] # lowercased #hashtags from the text; omit if none
    images:            # omit entirely when there are no photos
      - src: /images/notes/2026-11-20-1432-1.jpg
        alt: White mug with a Vancouver illustration on a wooden desk
@@ -44,6 +45,9 @@ minute or two after it is pushed.
    ```
 
    - Wrap bare URLs in `<...>` so they become links.
+   - Leave `#hashtags` in the text as written (the site links them); also list them,
+     lowercased and de-duplicated, in `tags:`. Ignore `#` inside URLs.
+   - This is the same format the `post-app/` PWA writes, so notes from either look identical.
    - A photo-only note is fine: leave the body empty.
 5. Build to check it renders: `bundle exec jekyll build` (use `bundle3.2` if plain
    `bundle` fails). Skip only if Ruby/bundler is unavailable.

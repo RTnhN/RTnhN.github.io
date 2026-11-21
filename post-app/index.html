@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Post a Note</title>
+  <meta name="description" content="Private composer for the notes feed on zachstrout.com." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Notes" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="app.css" />
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <h1>New note</h1>
+    <button type="button" class="icon-btn" id="open-settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Zm7.43-2.53a7.8 7.8 0 0 0 0-1.94l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.3 7.3 0 0 0-1.68-.97l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.49.42l-.38 2.65a7.3 7.3 0 0 0-1.68.97l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.65a7.8 7.8 0 0 0 0 1.94l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.13.22.39.31.61.22l2.49-1c.52.4 1.08.73 1.68.97l.38 2.65c.04.24.25.42.49.42h4c.24 0 .45-.18.49-.42l.38-2.65a7.3 7.3 0 0 0 1.68-.97l2.49 1c.22.09.48 0 .61-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65Z"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section id="setup" class="card" hidden>
+      <h2>Connect to GitHub</h2>
+      <p class="muted">Paste a fine-grained token with <b>Contents: Read and write</b> on your site repo. It stays on this device only.</p>
+      <form id="settings-form" autocomplete="off">
+        <label>Token
+          <input type="password" id="token" autocomplete="off" placeholder="github_pat_…" spellcheck="false" autocapitalize="off" />
+        </label>
+        <label>Repository
+          <input type="text" id="repo" spellcheck="false" autocapitalize="off" />
+        </label>
+        <label>Branch
+          <input type="text" id="branch" spellcheck="false" autocapitalize="off" />
+        </label>
+        <div class="row">
+          <button type="submit" class="primary">Save &amp; test</button>
+          <button type="button" id="close-settings" class="ghost">Cancel</button>
+        </div>
+        <button type="button" id="forget" class="danger-link">Forget token on this device</button>
+        <p id="settings-status" class="status" role="status"></p>
+      </form>
+    </section>
+
+    <section id="composer" class="card">
+      <div id="edit-banner" class="banner" hidden>
+        <span>Editing <b id="edit-name"></b> (photos stay as they are)</span>
+        <button type="button" id="cancel-edit" class="ghost small">Cancel</button>
+      </div>
+
+      <textarea id="text" rows="5" placeholder="What's happening? Use #hashtags and paste links."></textarea>
+      <div id="tags" class="tags" aria-live="polite"></div>
+
+      <div id="photos" class="photos"></div>
+
+      <div class="actions">
+        <label class="ghost photo-btn" id="photo-label">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2ZM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5Z"/></svg>
+          Photos
+          <input type="file" id="photo-input" accept="image/*" multiple hidden />
+        </label>
+        <span id="count" class="muted small-text"></span>
+        <button type="button" id="publish" class="primary" disabled>Post</button>
+      </div>
+      <p id="status" class="status" role="status"></p>
+    </section>
+
+    <section class="recent" id="recent">
+      <div class="recent-head">
+        <h2>Recent notes</h2>
+        <button type="button" id="refresh" class="ghost small">Refresh</button>
+      </div>
+      <ul id="recent-list"></ul>
+    </section>
+  </main>
+</body>
+</html>

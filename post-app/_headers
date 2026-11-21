@@ -1,0 +1,11 @@
+# Cloudflare Pages response headers.
+# The CSP only allows this app's own files to run and only lets it talk to the
+# GitHub API and the live site, so the token cannot be sent anywhere else.
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob:; connect-src 'self' https://api.github.com https://zachstrout.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-Robots-Tag: noindex, nofollow
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cache-Control: no-cache

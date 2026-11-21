@@ -22,6 +22,7 @@ permalink: /feed/notes.xml
     <id>{{ base }}{{ note.url }}</id>
     <published>{{ note.date | date_to_xmlschema }}</published>
     <updated>{{ note.date | date_to_xmlschema }}</updated>
+    {% for tag in note.tags %}<category term="{{ tag | xml_escape }}" />{% endfor %}
     <content type="html">{% capture html %}{{ note.content }}{% for img in note.images %}<p><img src="{{ base }}{{ img.src }}" alt="{{ img.alt | escape }}" /></p>{% endfor %}{% endcapture %}{{ html | xml_escape }}</content>
   </entry>
   {% endfor %}

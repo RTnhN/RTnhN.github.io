@@ -17,6 +17,39 @@
     });
   }
 
+  // Turn #hashtags in note text into links that search the feed for that tag.
+  function linkifyHashtags() {
+    var base = '/notes/?q=';
+    document.querySelectorAll('.note-body').forEach(function (body) {
+      var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (n) {
+          return n.parentNode.closest('a, code, pre') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      var nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(function (node) {
+        var re = /(^|[^\w&\/#])#([A-Za-z][\w-]*)/g;
+        var text = node.nodeValue, last = 0, m, frag = null;
+        while ((m = re.exec(text))) {
+          frag = frag || document.createDocumentFragment();
+          var start = m.index + m[1].length;
+          frag.appendChild(document.createTextNode(text.slice(last, start)));
+          var a = document.createElement('a');
+          a.className = 'note-tag';
+          a.href = base + encodeURIComponent('#' + m[2].toLowerCase());
+          a.textContent = '#' + m[2];
+          frag.appendChild(a);
+          last = start + 1 + m[2].length;
+        }
+        if (frag) {
+          frag.appendChild(document.createTextNode(text.slice(last)));
+          node.parentNode.replaceChild(frag, node);
+        }
+      });
+    });
+  }
+
   function feed() {
     var list = document.getElementById('notes-list');
     if (!list) return;
@@ -26,6 +59,10 @@
     var empty = document.getElementById('notes-empty');
     var cards = Array.prototype.slice.call(list.querySelectorAll('.note'));
     var shown = PAGE_SIZE;
+
+    // Pre-fill the search from ?q= (used by hashtag links).
+    var q0 = new URLSearchParams(location.search).get('q');
+    if (q0) search.value = q0;
 
     cards.forEach(function (c) {
       c._text = c.textContent.toLowerCase();
@@ -56,7 +93,7 @@
     render();
   }
 
-  function init() { relativeTimes(); feed(); }
+  function init() { relativeTimes(); linkifyHashtags(); feed(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();

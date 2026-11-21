@@ -202,3 +202,8 @@ textarea {
 #recent-list .empty { color: var(--muted); background: none; border: none; padding: 4px 0; }
 
 [hidden] { display: none !important; }
+
+.audit { list-style: none; padding: 0; margin: 8px 0 0; font-size: 14px; }
+.audit li { padding: 2px 0; }
+.audit .pass { color: var(--ok); }
+.audit .fail { color: var(--danger); }

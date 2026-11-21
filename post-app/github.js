@@ -49,6 +49,96 @@ export class GitHub {
     return repo;
   }
 
+  /** Status code of a request (0 on network error); never throws for HTTP errors. */
+  async status(method, url, body) {
+    try {
+      const res = await fetch(url.startsWith('http') ? url : `${API}${url}`, {
+        method,
+        cache: 'no-store',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          ...(body ? { 'Content-Type': 'application/json' } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      return { code: res.status, res };
+    } catch {
+      return { code: 0, res: null };
+    }
+  }
+
+  /**
+   * Check the token is a fine-grained token limited to this one repo with only
+   * Contents access. Uses reads, plus writes that are invalid on purpose (they fail
+   * validation with 422 only if the token HAS the permission, otherwise 403).
+   * Returns [{ ok, label, detail }].
+   */
+  async audit() {
+    const results = [];
+    const add = (ok, label, detail = '') => results.push({ ok, label, detail });
+    const r = `/repos/${this.repo}`;
+
+    // 1. Token type. Classic (ghp_) and OAuth tokens have broad scopes.
+    const fine = this.token.startsWith('github_pat_');
+    add(fine, 'Fine-grained token', fine ? '' : 'Classic tokens (ghp_…) can reach every repo. Create a fine-grained token instead.');
+    const probe = await this.status('GET', r);
+    const scopes = probe.res && probe.res.headers.get('X-OAuth-Scopes');
+    if (scopes) add(false, 'No classic OAuth scopes', `Token has scopes: ${scopes}`);
+
+    // 2. Can write Contents to this repo (creates an unreferenced blob; harmless).
+    const blob = await this.status('POST', `${r}/git/blobs`, { content: '', encoding: 'utf-8' });
+    add(blob.code === 201, 'Can write Contents to this repo',
+      blob.code === 201 ? '' : `GitHub answered ${blob.code || 'network error'}. Grant Contents: Read and write.`);
+
+    // 3. No other repositories.
+    const repos = await this.status('GET', '/user/repos?per_page=100&sort=full_name');
+    if (repos.code === 200) {
+      const names = (await repos.res.json()).map(x => x.full_name)
+        .filter(n => n.toLowerCase() !== this.repo.toLowerCase());
+      add(names.length === 0, 'Only this repository',
+        names.length ? `Also has access to: ${names.slice(0, 5).join(', ')}${names.length > 5 ? ` and ${names.length - 5} more` : ''}` : '');
+    } else {
+      add(true, 'Only this repository', 'Could not list repositories (that’s fine).');
+    }
+
+    // 4. No other repository permissions (reads that need a specific permission).
+    const repoReads = [
+      ['Administration', `${r}/keys`],
+      ['Webhooks', `${r}/hooks`],
+      ['Secrets', `${r}/actions/secrets`],
+      ['Variables', `${r}/actions/variables`],
+      ['Dependabot secrets', `${r}/dependabot/secrets`],
+      ['Codespaces secrets', `${r}/codespaces/secrets`],
+    ];
+    // Invalid-on-purpose writes: 422 means the permission exists; nothing is created.
+    const repoWrites = [
+      ['Issues (write)', `${r}/issues`],
+      ['Pull requests (write)', `${r}/pulls`],
+    ];
+    // 5. No account permissions.
+    const userReads = [
+      ['Email addresses', '/user/emails'],
+      ['Git SSH keys', '/user/keys'],
+      ['GPG keys', '/user/gpg_keys'],
+      ['SSH signing keys', '/user/ssh_signing_keys'],
+      ['Codespaces', '/user/codespaces'],
+      ['Block another user', '/user/blocks'],
+    ];
+
+    const checks = await Promise.all([
+      ...repoReads.map(async ([name, url]) => [name, (await this.status('GET', url)).code === 200]),
+      ...repoWrites.map(async ([name, url]) => [name, (await this.status('POST', url, {})).code === 422]),
+      ...userReads.map(async ([name, url]) => [name, (await this.status('GET', url)).code === 200]),
+    ]);
+    const extra = checks.filter(([, has]) => has).map(([name]) => name);
+    add(extra.length === 0, 'No permissions besides Contents',
+      extra.length ? `Also has: ${extra.join(', ')}` : '');
+
+    return results;
+  }
+
   async exists(path) {
     try {
       await this.req('GET', `/contents/${encPath(path)}?ref=${encodeURIComponent(this.branch)}`);

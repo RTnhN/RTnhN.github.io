@@ -27,6 +27,19 @@ script on the main site (analytics, MathJax CDN) can read the token.
   network access is limited to `api.github.com` and `zachstrout.com`.
 - Use a **fine-grained token** scoped to this one repo, with an expiry. Revoke it at
   <https://github.com/settings/tokens?type=beta> if a device is lost.
+- **The app refuses over-broad tokens.** On *Save & test* (and about once a day for a
+  saved token) it checks that the token:
+  - is fine-grained (`github_pat_…`) with no classic OAuth scopes;
+  - can write Contents to this repo (it creates an unreferenced blob, which is harmless);
+  - can reach no other repository (`/user/repos`);
+  - has none of Administration, Webhooks, Secrets, Variables, Dependabot secrets,
+    Codespaces secrets, Issues write, Pull requests write, or the account permissions
+    Email addresses, Git SSH keys, GPG keys, SSH signing keys, Codespaces, and Block
+    another user. Write checks send deliberately invalid requests: GitHub answers 422 only
+    when the permission exists, and nothing is created.
+  - **Not detectable from a browser:** the token's expiry (GitHub doesn't expose that
+    header to web pages) and write-only permissions such as Workflows, Actions write, or
+    Administration write. Check those on the token's settings page.
 
 ## One-time setup
 

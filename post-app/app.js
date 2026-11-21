@@ -87,10 +87,18 @@ $('settings-form').addEventListener('submit', async ev => {
   const repo = $('repo').value.trim() || DEFAULTS.repo;
   const branch = $('branch').value.trim() || DEFAULTS.branch;
   if (!token) return setStatus($('settings-status'), 'Paste a token first.', 'error');
-  setStatus($('settings-status'), 'Checking…');
+  setStatus($('settings-status'), 'Checking token permissions…');
   try {
-    await new GitHub({ token, repo, branch }).check();
+    const api = new GitHub({ token, repo, branch });
+    await api.check();
+    const results = await api.audit();
+    const failed = results.filter(x => !x.ok);
+    if (failed.length) {
+      setStatus($('settings-status'), auditReport(results), 'error');
+      return;
+    }
     store.set('token', token);
+    store.set('auditAt', String(Date.now()));
     store.set('repo', repo);
     store.set('branch', branch);
     showSettings(false);
@@ -99,6 +107,22 @@ $('settings-form').addEventListener('submit', async ev => {
     setStatus($('settings-status'), errorText(e), 'error');
   }
 });
+
+function auditReport(results) {
+  const frag = document.createDocumentFragment();
+  const p = document.createElement('p');
+  p.textContent = 'This token has more access than this app needs, so it was not saved. Create a fine-grained token for only this repo with only Contents: Read and write.';
+  const ul = document.createElement('ul');
+  ul.className = 'audit';
+  results.forEach(x => {
+    const li = document.createElement('li');
+    li.className = x.ok ? 'pass' : 'fail';
+    li.textContent = `${x.ok ? '✓' : '✗'} ${x.label}${x.detail && !x.ok ? ': ' + x.detail : ''}`;
+    ul.appendChild(li);
+  });
+  frag.append(p, ul);
+  return frag;
+}
 
 $('forget').addEventListener('click', () => {
   if (!confirm('Remove the GitHub token from this device?')) return;
@@ -440,9 +464,26 @@ $('refresh').addEventListener('click', loadRecent);
 textEl.value = store.get('draft') || '';
 applyShareParams();
 refreshComposer();
+// Re-check a saved token about once a day, so an existing over-broad token gets flagged.
+async function auditSavedToken() {
+  const last = Number(store.get('auditAt')) || 0;
+  if (Date.now() - last < 24 * 3600 * 1000) return;
+  try {
+    const results = await gh().audit();
+    if (results.some(x => !x.ok)) {
+      const report = auditReport(results);
+      report.firstChild.textContent = 'Your saved token has more access than this app needs. Replace it in settings with a fine-grained token for only this repo with only Contents: Read and write.';
+      setStatus($('status'), report, 'error');
+    } else {
+      store.set('auditAt', String(Date.now()));
+    }
+  } catch { /* offline: try again next time */ }
+}
+
 if (settings().token) {
   showSettings(false);
   loadRecent();
+  auditSavedToken();
 } else {
   showSettings(true);
 }

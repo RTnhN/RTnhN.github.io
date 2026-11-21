@@ -31,15 +31,21 @@ script on the main site (analytics, MathJax CDN) can read the token.
   saved token) it checks that the token:
   - is fine-grained (`github_pat_…`) with no classic OAuth scopes;
   - can write Contents to this repo (it creates an unreferenced blob, which is harmless);
-  - can reach no other repository (`/user/repos`);
+  - **cannot** see the private repo `RTnhN/sample_private_repo` (`CANARY_REPO` in
+    `github.js`). A token limited to this repo gets 404 there; "All repositories" gets 200;
   - has none of Administration, Webhooks, Secrets, Variables, Dependabot secrets,
-    Codespaces secrets, Issues write, Pull requests write, or the account permissions
-    Email addresses, Git SSH keys, GPG keys, SSH signing keys, Codespaces, and Block
-    another user. Write checks send deliberately invalid requests: GitHub answers 422 only
-    when the permission exists, and nothing is created.
+    Codespaces secrets, Pull requests write, or the account permissions Email addresses,
+    Git SSH keys, GPG keys, SSH signing keys, and Block another user. The Pull requests
+    check sends a deliberately invalid request: GitHub answers 422 only when the
+    permission exists, and nothing is created.
+  - **Not checked:** Issues write (public repos accept issue attempts from anyone) and
+    the Codespaces account permission (GitHub returns an empty list instead of refusing).
+    These still appear, marked "ignored", in diagnostics.
   - **Not detectable from a browser:** the token's expiry (GitHub doesn't expose that
     header to web pages) and write-only permissions such as Workflows, Actions write, or
     Administration write. Check those on the token's settings page.
+- **Run diagnostics** in settings shows GitHub's raw answer to every check for the token
+  in the field, without saving it.
 
 ## One-time setup
 

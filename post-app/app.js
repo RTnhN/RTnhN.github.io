@@ -2,7 +2,7 @@ import {
   noteStamp, buildNote, parseNote, replaceBody, extractTags, summary, preview, unsanitize,
   utf8ToBase64, base64ToUtf8, bytesToBase64,
 } from './lib.js';
-import { GitHub } from './github.js';
+import { GitHub, CANARY_REPO } from './github.js';
 
 const SITE_URL = 'https://zachstrout.com';
 const DEFAULTS = { repo: 'RTnhN/RTnhN.github.io', branch: 'master' };
@@ -123,6 +123,44 @@ function auditReport(results) {
   frag.append(p, ul);
   return frag;
 }
+
+// Raw results of every probe for the token in the field. Never saves the token.
+$('diagnose').addEventListener('click', async () => {
+  const token = $('token').value.trim() || settings().token;
+  const out = $('diagnostics');
+  out.hidden = false;
+  if (!token) { out.textContent = 'Paste a token first.'; return; }
+  out.textContent = 'Running…';
+  const api = new GitHub({
+    token,
+    repo: $('repo').value.trim() || DEFAULTS.repo,
+    branch: $('branch').value.trim() || DEFAULTS.branch,
+  });
+  try {
+    const rows = await api.probes(CANARY_REPO);
+    const table = document.createElement('table');
+    const head = table.insertRow();
+    ['Check', 'HTTP', 'Result'].forEach(h => {
+      const th = document.createElement('th');
+      th.textContent = h;
+      head.appendChild(th);
+    });
+    rows.forEach(p => {
+      const tr = table.insertRow();
+      tr.className = !p.enforce ? 'info' : p.granted ? 'fail' : 'pass';
+      tr.insertCell().textContent = p.name;
+      tr.insertCell().textContent = String(p.code || 'net');
+      tr.insertCell().textContent = (p.granted ? 'has access' : 'no access') +
+        (p.enforce ? '' : ' (ignored)') + (p.message ? ` · ${p.message}` : '');
+    });
+    const kind = document.createElement('p');
+    kind.className = 'muted small-text';
+    kind.textContent = `Token type: ${token.startsWith('github_pat_') ? 'fine-grained' : token.slice(0, 4) + '… (not fine-grained)'}. The token was not saved.`;
+    out.replaceChildren(kind, table);
+  } catch (e) {
+    out.textContent = errorText(e);
+  }
+});
 
 $('forget').addEventListener('click', () => {
   if (!confirm('Remove the GitHub token from this device?')) return;

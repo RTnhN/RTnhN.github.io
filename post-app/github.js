@@ -2,6 +2,9 @@
 
 const API = 'https://api.github.com';
 
+// A private repo the posting token must NOT be able to see.
+export const CANARY_REPO = 'RTnhN/sample_private_repo';
+
 export class GitHubError extends Error {
   constructor(status, message) {
     super(message);
@@ -70,19 +73,57 @@ export class GitHub {
   }
 
   /**
-   * Check the token is a fine-grained token limited to this one repo with only
-   * Contents access. Uses reads, plus writes that are invalid on purpose (they fail
-   * validation with 422 only if the token HAS the permission, otherwise 403).
+   * Every permission probe, with its raw result. Used by audit() and shown as-is in
+   * the diagnostics view. `enforce: false` probes are informational only: GitHub was
+   * seen answering them "yes" for tokens that lack the permission.
+   */
+  async probes(canary = CANARY_REPO) {
+    const r = `/repos/${this.repo}`;
+    const list = [
+      // Another (private) repo: a token limited to this repo must get 404.
+      { id: 'canary', name: `Access to ${canary}`, method: 'GET', path: `/repos/${canary}`, has: c => c === 200, enforce: true },
+      // Repository permissions (reads that need the permission; 403/404 without it).
+      { name: 'Administration', method: 'GET', path: `${r}/keys`, has: c => c === 200, enforce: true },
+      { name: 'Webhooks', method: 'GET', path: `${r}/hooks`, has: c => c === 200, enforce: true },
+      { name: 'Secrets', method: 'GET', path: `${r}/actions/secrets`, has: c => c === 200, enforce: true },
+      { name: 'Variables', method: 'GET', path: `${r}/actions/variables`, has: c => c === 200, enforce: true },
+      { name: 'Dependabot secrets', method: 'GET', path: `${r}/dependabot/secrets`, has: c => c === 200, enforce: true },
+      { name: 'Codespaces secrets', method: 'GET', path: `${r}/codespaces/secrets`, has: c => c === 200, enforce: true },
+      // Deliberately invalid writes: nothing is created either way.
+      { name: 'Pull requests (write)', method: 'POST', path: `${r}/pulls`, body: {}, has: c => c === 422, enforce: true },
+      { name: 'Issues (write)', method: 'POST', path: `${r}/issues`, body: {}, has: c => c === 422, enforce: false,
+        note: 'Public repos accept issue attempts from anyone, so this says nothing.' },
+      // Account permissions.
+      { name: 'Email addresses', method: 'GET', path: '/user/emails', has: c => c === 200, enforce: true },
+      { name: 'Git SSH keys', method: 'GET', path: '/user/keys', has: c => c === 200, enforce: true },
+      { name: 'GPG keys', method: 'GET', path: '/user/gpg_keys', has: c => c === 200, enforce: true },
+      { name: 'SSH signing keys', method: 'GET', path: '/user/ssh_signing_keys', has: c => c === 200, enforce: true },
+      { name: 'Block another user', method: 'GET', path: '/user/blocks', has: c => c === 200, enforce: true },
+      { name: 'Codespaces', method: 'GET', path: '/user/codespaces', has: c => c === 200, enforce: false,
+        note: 'Returns an empty list instead of refusing, so this says nothing.' },
+    ];
+    return Promise.all(list.map(async p => {
+      const { code, res } = await this.status(p.method, p.path, p.body);
+      let message = '';
+      if (res && code >= 400) {
+        try { message = (await res.json()).message || ''; } catch { /* not JSON */ }
+      }
+      return { ...p, code, message, granted: p.has(code) };
+    }));
+  }
+
+  /**
+   * Check the token is fine-grained, limited to this one repo, with only Contents.
    * Returns [{ ok, label, detail }].
    */
-  async audit() {
+  async audit(canary = CANARY_REPO) {
     const results = [];
     const add = (ok, label, detail = '') => results.push({ ok, label, detail });
     const r = `/repos/${this.repo}`;
 
     // 1. Token type. Classic (ghp_) and OAuth tokens have broad scopes.
     const fine = this.token.startsWith('github_pat_');
-    add(fine, 'Fine-grained token', fine ? '' : 'Classic tokens (ghp_…) can reach every repo. Create a fine-grained token instead.');
+    add(fine, 'Fine-grained token', fine ? '' : 'Classic and OAuth tokens can reach every repo. Create a fine-grained token instead.');
     const probe = await this.status('GET', r);
     const scopes = probe.res && probe.res.headers.get('X-OAuth-Scopes');
     if (scopes) add(false, 'No classic OAuth scopes', `Token has scopes: ${scopes}`);
@@ -92,49 +133,16 @@ export class GitHub {
     add(blob.code === 201, 'Can write Contents to this repo',
       blob.code === 201 ? '' : `GitHub answered ${blob.code || 'network error'}. Grant Contents: Read and write.`);
 
-    // 3. No other repositories.
-    const repos = await this.status('GET', '/user/repos?per_page=100&sort=full_name');
-    if (repos.code === 200) {
-      const names = (await repos.res.json()).map(x => x.full_name)
-        .filter(n => n.toLowerCase() !== this.repo.toLowerCase());
-      add(names.length === 0, 'Only this repository',
-        names.length ? `Also has access to: ${names.slice(0, 5).join(', ')}${names.length > 5 ? ` and ${names.length - 5} more` : ''}` : '');
-    } else {
-      add(true, 'Only this repository', 'Could not list repositories (that’s fine).');
-    }
+    const rows = (await this.probes(canary)).filter(p => p.enforce);
 
-    // 4. No other repository permissions (reads that need a specific permission).
-    const repoReads = [
-      ['Administration', `${r}/keys`],
-      ['Webhooks', `${r}/hooks`],
-      ['Secrets', `${r}/actions/secrets`],
-      ['Variables', `${r}/actions/variables`],
-      ['Dependabot secrets', `${r}/dependabot/secrets`],
-      ['Codespaces secrets', `${r}/codespaces/secrets`],
-    ];
-    // Invalid-on-purpose writes: 422 means the permission exists; nothing is created.
-    const repoWrites = [
-      ['Issues (write)', `${r}/issues`],
-      ['Pull requests (write)', `${r}/pulls`],
-    ];
-    // 5. No account permissions.
-    const userReads = [
-      ['Email addresses', '/user/emails'],
-      ['Git SSH keys', '/user/keys'],
-      ['GPG keys', '/user/gpg_keys'],
-      ['SSH signing keys', '/user/ssh_signing_keys'],
-      ['Codespaces', '/user/codespaces'],
-      ['Block another user', '/user/blocks'],
-    ];
+    // 3. Only this repository.
+    const c = rows.find(p => p.id === 'canary');
+    add(!c.granted, 'Only this repository',
+      c.granted ? `Can read the private repo ${canary}. Set Repository access to "Only select repositories".` : '');
 
-    const checks = await Promise.all([
-      ...repoReads.map(async ([name, url]) => [name, (await this.status('GET', url)).code === 200]),
-      ...repoWrites.map(async ([name, url]) => [name, (await this.status('POST', url, {})).code === 422]),
-      ...userReads.map(async ([name, url]) => [name, (await this.status('GET', url)).code === 200]),
-    ]);
-    const extra = checks.filter(([, has]) => has).map(([name]) => name);
-    add(extra.length === 0, 'No permissions besides Contents',
-      extra.length ? `Also has: ${extra.join(', ')}` : '');
+    // 4. No permissions besides Contents.
+    const extra = rows.filter(p => p.id !== 'canary' && p.granted).map(p => p.name);
+    add(extra.length === 0, 'No permissions besides Contents', extra.length ? `Also has: ${extra.join(', ')}` : '');
 
     return results;
   }

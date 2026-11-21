@@ -207,3 +207,12 @@ textarea {
 .audit li { padding: 2px 0; }
 .audit .pass { color: var(--ok); }
 .audit .fail { color: var(--danger); }
+
+.diagnostics { margin-top: 10px; font-size: 13px; overflow-x: auto; }
+.diagnostics table { width: 100%; border-collapse: collapse; }
+.diagnostics th, .diagnostics td { text-align: left; padding: 4px 6px 4px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.diagnostics th { color: var(--muted); font-weight: 600; }
+.diagnostics .pass td:last-child { color: var(--ok); }
+.diagnostics .fail td:last-child { color: var(--danger); }
+.diagnostics .info td { color: var(--muted); }
+#diagnose { margin-top: 10px; }

@@ -8,6 +8,21 @@ const SITE_URL = 'https://zachstrout.com';
 const DEFAULTS = { repo: 'RTnhN/RTnhN.github.io', branch: 'master' };
 const MAX_EDGE = 1600;
 const RECENT = 10;
+const MAX_GIF_BYTES = 15 * 1024 * 1024;
+
+const isGif = file => file.type === 'image/gif' || /\.gif$/i.test(file.name || '');
+
+// GIFs are uploaded untouched so they keep their animation (a canvas would keep
+// only the first frame). Every other image is resized and re-encoded to JPEG.
+async function prepareImage(file) {
+  if (isGif(file)) {
+    if (file.size > MAX_GIF_BYTES) {
+      throw new Error(`GIF is ${(file.size / 1048576).toFixed(1)} MB; the limit is 15 MB.`);
+    }
+    return { blob: file, ext: 'gif' };
+  }
+  return { blob: await processImage(file), ext: 'jpg' };
+}
 
 const $ = id => document.getElementById(id);
 
@@ -197,8 +212,8 @@ $('photo-input').addEventListener('change', async ev => {
   setStatus($('status'), `Preparing ${files.length} photo${files.length > 1 ? 's' : ''}…`);
   for (const f of files) {
     try {
-      const blob = await processImage(f);
-      photos.push({ blob, url: URL.createObjectURL(blob), alt: '' });
+      const { blob, ext } = await prepareImage(f);
+      photos.push({ blob, ext, url: URL.createObjectURL(blob), alt: '' });
     } catch (e) {
       setStatus($('status'), `Couldn't read ${f.name}: ${e.message}`, 'error');
     }
@@ -270,7 +285,7 @@ async function publish() {
       const images = [];
       for (let i = 0; i < photos.length; i++) {
         setStatus(status, `Uploading photo ${i + 1} of ${photos.length}…`);
-        const path = `images/notes/${stem}-${i + 1}.jpg`;
+        const path = `images/notes/${stem}-${i + 1}.${photos[i].ext}`;
         changes.push({ path, base64: await blobToBase64(photos[i].blob) });
         images.push({ src: '/' + path, alt: photos[i].alt.trim() });
       }

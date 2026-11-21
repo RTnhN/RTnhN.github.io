@@ -33,9 +33,14 @@ minute or two after it is pushed.
 2. Filename: `_notes/YYYY-MM-DD-HHMM.md` from that time. If it exists, append `-2`, `-3`…
 3. Photos (optional, any number). For each attached image, in order:
    - Save it to `images/notes/<note-stem>-<n>.jpg` (n starts at 1).
-   - Fix orientation, shrink, and strip ALL metadata (iPhone photos carry GPS):
+   - Non-GIF photos: fix orientation, shrink, and strip ALL metadata (iPhone photos carry GPS):
      `convert IN -auto-orient -resize '1600x1600>' -strip -quality 85 OUT.jpg`
      (or Pillow: `ImageOps.exif_transpose`, `thumbnail((1600,1600))`, save without exif).
+   - **GIFs:** keep them as `.gif` (`images/notes/<note-stem>-<n>.gif`) so they stay
+     animated. Never convert a GIF to JPEG (ImageMagick would write one file per frame).
+     If it's over ~2 MB or larger than 800px, shrink it while keeping the animation:
+     `convert IN.gif -coalesce -resize '800x800>' -layers optimize OUT.gif`.
+     Refuse GIFs that are still over 15 MB.
    - Write a short, plain alt text describing the photo.
    - If you cannot get the image as a file (only see it), tell the user instead of
      posting without it.

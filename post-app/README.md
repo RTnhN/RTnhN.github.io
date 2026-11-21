@@ -8,7 +8,8 @@ GitHub Pages then rebuilds the site.
 - Writes the same format as the `post-note` Claude/Codex skill
   (`_notes/YYYY-MM-DD-HHMM.md`, photos in `images/notes/`).
 - Photos are resized to 1600px and re-encoded on the phone, which strips all metadata
-  (including GPS) before upload.
+  (including GPS) before upload. GIFs are uploaded unchanged (up to 15 MB) so they stay
+  animated.
 - `#hashtags` stay in the text and are also written to `tags:`.
 - One commit per note (photos included); recent notes can be edited or deleted.
 - `?text=…&url=…` pre-fills the composer (handy for an iOS Shortcut share action).
